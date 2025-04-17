@@ -1,3 +1,7 @@
+- Install requirements:
+```
+pip3 install -r /path/to/requirements.txt
+```
 - Install MySQL if not already installed.
 - Create a new database:
 ```
