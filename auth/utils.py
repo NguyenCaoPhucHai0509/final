@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 import jwt
+from jwt.exceptions import InvalidTokenError
 from fastapi import Depends
 from sqlmodel import Session, Field, select
+from pydantic import ValidationError
 from typing import Annotated
 import bcrypt
 
@@ -13,7 +15,6 @@ from .config import get_settings
 settings = get_settings()
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
-
 
 def get_password_hash(password):
     pwd_bytes = password.encode("utf-8")
@@ -35,7 +36,7 @@ async def get_user_by_username(
     staff = session.exec(
         select(User)
         .where(User.username == username)
-    ).first()
+    ).one()
 
     return staff
 

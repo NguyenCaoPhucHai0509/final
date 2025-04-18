@@ -1,11 +1,17 @@
 from sqlmodel import SQLModel, Field
-from pydantic import EmailStr
+from pydantic import EmailStr, BaseModel
 from typing import Annotated
 from enum import Enum
 
+class TokenData(BaseModel):
+    username: Annotated[str | None, Field(default=None)]
+
 class UserRole(str, Enum):
-    staff = "staff"
     customer = "customer"
+    restaurant_owner = "restaurant_owner"
+    kitchen_staff = "kitchen_staff"
+    delivery_driver = "delivery_driver"
+    support_staff = "support_staff"
 
 class UserBase(SQLModel):
     email: Annotated[EmailStr, Field()]
