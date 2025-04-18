@@ -27,7 +27,7 @@ CREATE TABLE `users` (
   `email` varchar(64) NOT NULL,
   `username` varchar(64) NOT NULL,
   `hashed_password` varchar(60) NOT NULL,
-  `user_role` enum('customer','restaurant_owner','kitchen_staff','delivery_driver','support_staff') NOT NULL DEFAULT 'customer',
+  `role` enum('customer','restaurant_owner','kitchen_staff','delivery_driver','support_staff') NOT NULL DEFAULT 'customer',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
@@ -41,7 +41,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'restaurant_owner@example.com','restaurant_owner','$2b$12$eCbHtlktK37rqqo7dF2nouIr/QaI/POr40OPvQy/AUMox1rmwVqUu','restaurant_owner',1);
+INSERT INTO `users` VALUES (1,'restaurant_owner@example.com','restaurant_owner','$2b$12$I2S/.Y8E426UiOn26q7HZuoQNLHgsUqJBcVeYR5YNCPx/WFXWDUP2','restaurant_owner',1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-18 17:38:54
+-- Dump completed on 2025-04-18 18:52:01

@@ -16,7 +16,7 @@ class UserRole(str, Enum):
 class UserBase(SQLModel):
     email: Annotated[EmailStr, Field()]
     username: Annotated[str, Field(unique=True)]
-    user_role: Annotated[UserRole, Field(default=UserRole.customer)]
+    role: Annotated[UserRole, Field(default=UserRole.customer)]
 
 class User(UserBase, table=True):
     __tablename__ = "users"
