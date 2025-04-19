@@ -9,7 +9,7 @@ from jwt.exceptions import InvalidTokenError
 
 from .utils import (
     get_password_hash, authenticate, create_access_token,
-    get_user_by_username
+    get_current_active_user
 )
 from .config import get_settings
 from .database import get_session
@@ -22,7 +22,7 @@ SECRET_KEY = settings.SECRET_KEY
 
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
 
 @router.post("/register", response_model=UserPublic)
 async def create_user(
@@ -74,40 +74,6 @@ async def login(
         "access_token": access_token, 
         "token_type": "bearer"
     }
-
-async def get_current_user(
-    *,
-    token: Annotated[str, Depends(oauth2_scheme)],
-    session: Annotated[Session, Depends(get_session)]
-):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"}
-    )
-
-    try:
-        payload: dict = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if not username:
-            raise credentials_exception
-        # token_data = TokenData(username=username)
-    except InvalidTokenError:
-        raise credentials_exception
-    
-    user = await get_user_by_username(session=session, username=username)
-    return user
-
-async def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)]
-):
-    if not current_user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
-            detail="Inactive user"
-        )
-    return current_user
-
 
 """
 Client must send "Authorization: Bearer <Token>" header. When testing API, we click "Authorize" button
