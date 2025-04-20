@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
--- Host: localhost    Database: menu
+-- Host: localhost    Database: restaurant
 -- ------------------------------------------------------
 -- Server version	8.0.42
 
@@ -33,7 +33,7 @@ CREATE TABLE `menu_items` (
   KEY `restaurant_id` (`restaurant_id`),
   CONSTRAINT `menu_items_ibfk_1` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `menu_items_chk_1` CHECK ((`price` >= 0))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,6 +42,7 @@ CREATE TABLE `menu_items` (
 
 LOCK TABLES `menu_items` WRITE;
 /*!40000 ALTER TABLE `menu_items` DISABLE KEYS */;
+INSERT INTO `menu_items` VALUES (1,1,'Margherita Pizza','Classic Italian pizza topped with fresh tomatoes, mozzarella cheese, and basil leaves.',12.99,1),(2,1,'Spaghetti Carbonara','Traditional Roman pasta dish made with eggs, Pecorino Romano cheese, guanciale, and black pepper.',14.50,1),(3,1,'Chicken Tikka Masala','Tender pieces of chicken cooked in a creamy tomato-based curry sauce with Indian spices.',15.75,1),(4,1,'Beef Burger','Juicy beef patty served with lettuce, tomato, onion, pickles, and a choice of cheese.',10.99,0),(5,1,'Caesar Salad','Fresh romaine lettuce tossed with Caesar dressing, croutons, and Parmesan cheese.',8.50,1),(6,1,'Sushi Platter','Assorted sushi rolls including salmon, tuna, and avocado, served with soy sauce and wasabi.',22.00,1),(7,1,'Chocolate Lava Cake','Warm chocolate cake with a gooey molten center, served with vanilla ice cream.',6.99,1),(8,1,'Grilled Salmon','Pan-seared salmon fillet seasoned with herbs and lemon, served with steamed vegetables.',18.25,0),(9,1,'Vegetable Stir Fry','Mixed vegetables stir-fried in a savory soy-ginger sauce, served over steamed rice.',11.50,1),(10,1,'Tiramisu','Classic Italian dessert made with layers of coffee-soaked ladyfingers and mascarpone cream.',7.50,1);
 /*!40000 ALTER TABLE `menu_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,4 +82,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-20 16:31:47
+-- Dump completed on 2025-04-20 18:35:26

@@ -9,9 +9,6 @@ from ..utils.auth_utils import (
 from ..crud.restaurant_crud import (
     create_restaurant, get_restaurants
 )
-from ..crud.menu_item_crud import (
-    get_menu_items_by_restaurant_id
-)
 from ..logic.restaurant_logic import (
     create_menu_item_with_ownership
 )
@@ -68,18 +65,3 @@ async def create_menu_item(
     return create_menu_item_with_ownership(
         session, current_user["id"], restaurant_id, menu_item
     )
-
-"""
-View the menu of a specific restaurant
-Actors: all
-"""
-@router.get("/restaurants/{restaurant_id}/menu-items", 
-            response_model=list[MenuItemPublic])
-async def read_menu_items_of_restaurant(
-    session: Annotated[Session, Depends(get_session)],
-    restaurant_id: Annotated[int, Path()],
-    offset: Annotated[int, Query()] = 0,
-    limit: Annotated[int, Query()] = 100
-):
-    return get_menu_items_by_restaurant_id(session, restaurant_id, 
-                                           offset, limit)

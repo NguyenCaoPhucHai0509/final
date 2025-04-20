@@ -1,11 +1,10 @@
 from fastapi import Path, Depends, Body, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.routing import APIRouter
-from sqlmodel import Session, Field
+from sqlmodel import Session
 from typing import Annotated
 from datetime import timedelta
-import jwt
-from jwt.exceptions import InvalidTokenError
+
 
 from .utils import (
     get_password_hash, authenticate, create_access_token,
@@ -16,9 +15,8 @@ from .database import get_session
 from .models import User, UserCreate, UserPublic
 
 settings = get_settings()
-ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
-SECRET_KEY = settings.SECRET_KEY
+
 
 router = APIRouter()
 
@@ -76,8 +74,9 @@ async def login(
     }
 
 """
-Client must send "Authorization: Bearer <Token>" header. When testing API, we click "Authorize" button
-and fill the credentials. Then the "/auth/me" endpoints will automatic extract the Authorization header
+Client must send "Authorization: Bearer <Token>" header.
+When testing API, we click "Authorize" button and fill the credentials.
+Then the "/auth/me" endpoints will automatic extract the Authorization header
 """
 @router.get("/me", response_model=UserPublic)
 async def read_me(
