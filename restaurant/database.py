@@ -4,7 +4,7 @@ from .config import get_settings
 settings = get_settings()
 PASSWORD = settings.PASSWORD
 
-DATABASE_URL = f"mysql+pymysql://root:{PASSWORD}@localhost:3306/menu"
+DATABASE_URL = f"mysql+pymysql://root:{PASSWORD}@localhost:3306/restaurant"
 engine = create_engine(DATABASE_URL, echo=True)
 
 def create_db_and_tables():
