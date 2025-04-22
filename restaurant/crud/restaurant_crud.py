@@ -1,19 +1,17 @@
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
-from ..models.restaurants import Restaurant, RestaurantCreate
+from ..models.restaurants import Restaurant
 
 
 # Create a restaurant
 def create_restaurant(
-    session: Session, owner_id: int, restaurant: RestaurantCreate
+    session: Session, restaurant_db: Restaurant
 ):
-    restaurant_db = Restaurant.model_validate(restaurant, 
-                            update={"owner_id": owner_id})
     session.add(restaurant_db)
     session.commit()
     session.refresh(restaurant_db)
-    return restaurant
+    return restaurant_db
 
 # Get list of restuarants
 def get_restaurants(

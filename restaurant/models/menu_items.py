@@ -5,7 +5,7 @@ from decimal import Decimal
 
 class MenuItemBase(SQLModel):
     name: Annotated[str, Field()]
-    price: Annotated[Decimal, Field(ge=0)]
+    price: Annotated[Decimal, Field(max_digits=10, decimal_places=2, ge=0)]
     description: Annotated[str | None, Field()] = None
     is_available: Annotated[bool | None, Field(default=True)]
     # could have create_at, updated_at
