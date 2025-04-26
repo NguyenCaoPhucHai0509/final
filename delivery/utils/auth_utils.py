@@ -32,7 +32,7 @@ def require_role(allowed_roles: list[str]):
         return current_user
     return checker
 
-async def get_current_kitchen_staff_info(
+async def get_current_driver(
     credentials: HTTPAuthorizationCredentials = Depends(security)    
 ):
     token = credentials.credentials
@@ -40,7 +40,7 @@ async def get_current_kitchen_staff_info(
 
     async def call(client: AsyncClient):
         return await client.get(
-                        url=f"{AUTH_SERVICE_URL}/kitchen-staffs/me", 
+                        url=f"{AUTH_SERVICE_URL}/drivers/me", 
                         headers={"Authorization": auth_header}
                     )
     

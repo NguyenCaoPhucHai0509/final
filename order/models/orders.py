@@ -1,30 +1,51 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
 from datetime import datetime
+from decimal import Decimal
 from typing import Annotated, TYPE_CHECKING
-from .order_items import OrderItemCreate
+
+if TYPE_CHECKING:
+    from .order_items import OrderItem, OrderItemCreate, OrderItemPublicV1
 
 class OrderStatus(str, Enum):
     pending = "pending"
     preparing = "preparing"
+    ready_for_delivery = "ready_for_delivery"
     out_for_delivery = "out_for_delivery"
     delivered = "delivered"
 
-class OrderBase(SQLModel):
-    customer_id: Annotated[int, Field()]
-    restaurant_id: Annotated[int, Field()]
-
-class Order(OrderBase, table=True):
-    __tablename__ = "orders"
-    id: Annotated[int | None, Field(default=None, primary_key=True)]
-    status: Annotated[OrderStatus, Field(default=OrderStatus.pending)]
-    created_at: Annotated[datetime, Field(default_factory=datetime.now)]
-
 class OrderCreate(SQLModel):
-    restaurant_id: Annotated[int, Field()]
-    items: Annotated[list["OrderItemCreate"], Field()]
+    branch_id: int
+    items: list["OrderItemCreate"] = Field(min_length=1)
 
-class OrderPublic(OrderBase):
-    id: Annotated[int, Field()]
-    status: Annotated[OrderStatus, Field()]
-    created_at: Annotated[datetime, Field()]
+    dropoff_lon: Decimal = Field(max_digits=9, decimal_places=6)
+    dropoff_lat: Decimal = Field(max_digits=9, decimal_places=6)
+
+class OrderUpdate(SQLModel):
+    status: OrderStatus | None = None
+    created_at: datetime | None = None
+
+class Order(SQLModel, table=True):
+    __tablename__ = "orders"
+    id: int | None = Field(default=None, primary_key=True)
+    branch_id: int
+    customer_id: int
+    status: OrderStatus = Field(default=OrderStatus.pending)
+    total_amount: Decimal | None = Field(default=None, max_digits=13, decimal_places=3)
+    created_at: datetime = Field(default_factory=datetime.now)
+
+    order_items: list["OrderItem"] | None = Relationship(back_populates="order")
+
+class OrderPublic(SQLModel):
+    id: int
+    branch_id: int
+    customer_id: int
+    status: OrderStatus
+    created_at: datetime
+    total_amount: Decimal | None
+
+    order_items: list["OrderItemPublicV1"]
+
+from .order_items import OrderItemCreate, OrderItemPublicV1
+OrderCreate.model_rebuild()
+OrderPublic.model_rebuild()

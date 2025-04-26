@@ -1,33 +1,34 @@
-from fastapi import Path, Depends, Body, HTTPException, status
+from fastapi import Path, Depends, Body, Query, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.routing import APIRouter
 from sqlmodel import Session
 from typing import Annotated
 from datetime import timedelta
 
-
-from .utils import (
+from ..utils.auth_utils import (
     get_password_hash, authenticate, create_access_token,
-    get_current_active_user
+    get_current_active_user, require_role
 )
-from .config import get_settings
-from .database import get_session
-from .models import User, UserCreate, UserPublic
-
-settings = get_settings()
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
-
+from ..models.users import User, UserCreate, UserPublic
+from ..models.drivers import Driver
+from ..config import Settings, get_settings
+from ..database import get_session
 
 router = APIRouter()
-
-
 
 @router.post("/register", response_model=UserPublic)
 async def create_user(
     *, 
-    session: Annotated[Session, Depends(get_session)],
-    user: Annotated[UserCreate, Body()]
+    session: Session = Depends(get_session),
+    user: UserCreate = Body()
 ):
+    
+    if user.role == "owner" or user.role == "admin":
+        raise HTTPException(
+            status_code=400,
+            detail="You are not allowed to create account with this role"
+        )
+        
     hashed_password = get_password_hash(user.password)
     extra_data = {"hashed_password": hashed_password}
     user_db = User.model_validate(user, update=extra_data)
@@ -40,12 +41,19 @@ async def create_user(
         )
     session.commit()
     session.refresh(user_db)
+
+    # Automatic create `drivers` record
+    if user.role == "driver":
+        session.add(Driver(user_id=user_db.id))
+        session.commit()
+
     return user_db
 
 @router.post("/login")
 async def login(
     *,
     session: Annotated[Session, Depends(get_session)],
+    settings: Settings = Depends(get_settings),
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
     user = await authenticate(
@@ -61,7 +69,8 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"}
         )
     
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={
             "sub": str(user.username)

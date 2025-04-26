@@ -4,27 +4,28 @@ from decimal import Decimal
 
 
 class MenuItemBase(SQLModel):
-    name: Annotated[str, Field()]
-    price: Annotated[Decimal, Field(max_digits=10, decimal_places=2, ge=0)]
-    description: Annotated[str | None, Field()] = None
-    is_available: Annotated[bool | None, Field(default=True)]
+    name: str
+    price: Decimal = Field(max_digits=10, decimal_places=2, ge=0)
+    description: str | None = None
+    is_available: bool | None = True
     # could have create_at, updated_at
-
-class MenuItem(MenuItemBase, table=True):
-    __tablename__ = "menu_items"
-    id: Annotated[int, Field(default=None, primary_key=True)]
-    restaurant_id: Annotated[int, Field(foreign_key="restaurants.id")]
 
 class MenuItemCreate(MenuItemBase):
     pass
 
-class MenuItemPublic(MenuItemBase):
-    id: Annotated[int, Field()]
-    restaurant_id: Annotated[int, Field()]
-
 class MenuItemUpdate(SQLModel):
-    restaurant_id: int | None = None
-    name: str | None = None
-    price: Annotated[Decimal | None, Field(ge=0)] = None
+    branch_id: int = None
+    name: str = None
+    price: Decimal = Field(ge=0)
     description: str | None = None
-    is_available: bool | None = None
+    is_available: bool = None
+
+class MenuItem(MenuItemBase, table=True):
+    __tablename__ = "menu_items"
+    id: int = Field(default=None, primary_key=True)
+    branch_id: int = Field(foreign_key="branches.id")
+
+class MenuItemPublic(MenuItemBase):
+    id: int
+    branch_id: int
+

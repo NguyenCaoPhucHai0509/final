@@ -1,25 +1,29 @@
 from fastapi import HTTPException, status, Header, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+# from fastapi.security import OAuth2PasswordBearer
 import httpx
 from typing import Annotated
+from .http_call_utils import http_call
 
-AUTH_SERVICE_URL = "http://localhost:8001/auth"
+AUTH_SERVICE_URL = "http://localhost:8001"
+security = HTTPBearer()
 
-def get_auth_header(authorization: Annotated[str, Header()]):
+def get_token(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    return credentials.credentials
 
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing or invalid Authorization header"
-        )
-    
-    return authorization
-
-async def get_current_active_user(auth_header: Annotated[str, Depends(get_auth_header)]):
+async def get_current_active_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    token = credentials.credentials
+    auth_header = f"Bearer {token}"
+    # print(f"AUTHORIZATION: {auth_header}")
 
     async with httpx.AsyncClient() as client:
         try:
             response: httpx.Response = await client.get(
-                    url=f"{AUTH_SERVICE_URL}/me", 
+                    url=f"{AUTH_SERVICE_URL}/auth/me", 
                     headers={"Authorization": auth_header}
             )
             response.raise_for_status()
@@ -46,3 +50,13 @@ def require_role(allowed_roles: list[str]):
             )
         return current_user
     return checker
+
+async def update_restuarant_id_of_manager(manager_id: int, restaurant_id: int):
+    async def call(client: httpx.AsyncClient):
+        return await client.patch(
+            f"{AUTH_SERVICE_URL}/managers/{manager_id}/update-restaurant-id",
+            headers={"Content-Type": "application/json-patch+json"},
+            json={"restaurant_id": restaurant_id}
+        )
+    return await http_call(call)
+
